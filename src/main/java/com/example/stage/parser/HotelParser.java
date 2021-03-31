@@ -21,7 +21,6 @@ public class HotelParser {
         map.put(5, "Longitude");
         map.put(6, "Latitude");
     }
-    public static final String NULL_DATA = "NA";
 
     public static HotelData parse(Record record){
         long id = Long.parseLong(getValue(record,0));

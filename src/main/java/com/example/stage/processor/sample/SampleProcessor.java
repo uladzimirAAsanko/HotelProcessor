@@ -66,8 +66,11 @@ public abstract class SampleProcessor extends SingleLaneRecordProcessor {
   @Override
   protected void process(Record record, SingleLaneBatchMaker batchMaker) throws StageException {
     LOG.info("Input record: {}", record);
-    if(HotelParser.getValue(record,5).equals(HotelParser.NULL_DATA) ||
-            HotelParser.getValue(record,6).equals(HotelParser.NULL_DATA)){
+    try {
+      Double.parseDouble(HotelParser.getValue(record,5));
+      Double.parseDouble(HotelParser.getValue(record,6));
+    }catch (NumberFormatException e){
+      LOG.info("Invalid data for Lng and Lat");
       JOpenCageLatLng firstResultLatLng = mapLngLat(record);
       record.set("/Longitude", Field.create(firstResultLatLng.getLng()));
       record.set("/Latitude", Field.create(firstResultLatLng.getLat()));
