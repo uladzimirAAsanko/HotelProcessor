@@ -67,6 +67,8 @@ public abstract class SampleProcessor extends SingleLaneRecordProcessor {
   protected void process(Record record, SingleLaneBatchMaker batchMaker) throws StageException {
     LOG.info("Input record: {}", record);
     LOG.info("Inside record: {}", record.get("/"));
+    LOG.info("Inside record: {}", record.get("/"));
+    LOG.info("GetPaths: {}",  record.getEscapedFieldPaths());
     if(record.get("/5") == null || record.get("/6") == null){
       return;
     }
