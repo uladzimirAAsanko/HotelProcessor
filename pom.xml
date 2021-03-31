@@ -27,17 +27,7 @@
     <junit.version>4.12</junit.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-  <repositories>
-    <!-- ... other repository elements ... -->
-    <repository>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <id>central</id>
-      <name>bintray</name>
-      <url>https://jcenter.bintray.com</url>
-    </repository>
-  </repositories>
+
   <dependencies>
     <!-- Core StreamSets Dependencies for Stage Libraries -->
     <!-- Need to be without snapshot at any the point of the release -->
