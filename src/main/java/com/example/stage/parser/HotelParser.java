@@ -18,8 +18,8 @@ public class HotelParser {
         map.put(2, "Country");
         map.put(3, "City");
         map.put(4, "Address");
-        map.put(5, "Latitude");
-        map.put(6, "Longitude");
+        map.put(5, "Longitude");
+        map.put(6, "Latitude");
     }
     public static final String NULL_DATA = "NA";
 
