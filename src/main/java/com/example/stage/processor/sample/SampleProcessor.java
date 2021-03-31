@@ -72,6 +72,9 @@ public abstract class SampleProcessor extends SingleLaneRecordProcessor {
     }catch (NumberFormatException e){
       LOG.info("Invalid data for Lng and Lat");
       JOpenCageLatLng firstResultLatLng = mapLngLat(record);
+      if(firstResultLatLng == null){
+        return;
+      }
       record.set("/Longitude", Field.create(firstResultLatLng.getLng()));
       record.set("/Latitude", Field.create(firstResultLatLng.getLat()));
     }
