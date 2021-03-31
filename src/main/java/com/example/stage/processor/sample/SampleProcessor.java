@@ -66,8 +66,6 @@ public abstract class SampleProcessor extends SingleLaneRecordProcessor {
   @Override
   protected void process(Record record, SingleLaneBatchMaker batchMaker) throws StageException {
     LOG.info("Input record: {}", record);
-    LOG.info("Inside record: {}", record.get("/"));
-    LOG.info("GetPaths: {}",  record.getEscapedFieldPaths());
     if(HotelParser.getValue(record,5).equals(HotelParser.NULL_DATA) ||
             HotelParser.getValue(record,6).equals(HotelParser.NULL_DATA)){
       JOpenCageLatLng firstResultLatLng = mapLngLat(record);
@@ -75,7 +73,17 @@ public abstract class SampleProcessor extends SingleLaneRecordProcessor {
       record.set("/Latitude", Field.create(firstResultLatLng.getLat()));
     }
     HotelData hotel = HotelParser.parse(record);
-    String hash = GeoHashGenerator.generateGeoHash(hotel);
+    String hash = "";
+    try {
+      hash = GeoHashGenerator.generateGeoHash(hotel);
+    }catch (IllegalArgumentException e){
+      LOG.info("Ilegal Lng or Lat: {}", e.getMessage());
+      JOpenCageLatLng firstResultLatLng = mapLngLat(record);
+      record.set("/Longitude", Field.create(firstResultLatLng.getLng()));
+      record.set("/Latitude", Field.create(firstResultLatLng.getLat()));
+      HotelData changed_hotel = HotelParser.parse(record);
+      hash = GeoHashGenerator.generateGeoHash(changed_hotel);
+    }
     record.set("/geoHash", Field.create(hash));
     batchMaker.addRecord(record);
     LOG.info("Generated hash is: {}", hash);
@@ -90,4 +98,5 @@ public abstract class SampleProcessor extends SingleLaneRecordProcessor {
     JOpenCageResponse response = jOpenCageGeocoder.forward(request);
     return response.getFirstPosition();
   }
+
 }
