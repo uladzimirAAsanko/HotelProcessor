@@ -8,7 +8,19 @@ import com.example.stage.entity.HotelData;
 import com.streamsets.pipeline.api.Field;
 import com.streamsets.pipeline.api.Record;
 
+import java.util.HashMap;
+
 public class HotelParser {
+    private static HashMap<Integer, String> map = new HashMap<>();
+    static {
+        map.put(0, "Id");
+        map.put(1, "Name");
+        map.put(2, "Country");
+        map.put(3, "City");
+        map.put(4, "Address");
+        map.put(5, "Latitude");
+        map.put(6, "Longitude");
+    }
     public static final String NULL_DATA = "NA";
 
     public static HotelData parse(Record record){
@@ -25,7 +37,7 @@ public class HotelParser {
     }
 
     public static String getValue(Record record, int number){
-        String fieldPath  = "/" + number;
+        String fieldPath  = "/" + map.get(number);
         Field field = record.get(fieldPath);
         return field.getValueAsString();
     }
