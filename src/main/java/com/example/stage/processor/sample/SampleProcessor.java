@@ -67,20 +67,16 @@ public abstract class SampleProcessor extends SingleLaneRecordProcessor {
   protected void process(Record record, SingleLaneBatchMaker batchMaker) throws StageException {
     LOG.info("Input record: {}", record);
     LOG.info("Inside record: {}", record.get("/"));
-    LOG.info("Inside record: {}", record.get("/"));
     LOG.info("GetPaths: {}",  record.getEscapedFieldPaths());
-    if(record.get("/5") == null || record.get("/6") == null){
-      return;
-    }
     if(HotelParser.getValue(record,5).equals(HotelParser.NULL_DATA) ||
             HotelParser.getValue(record,6).equals(HotelParser.NULL_DATA)){
       JOpenCageLatLng firstResultLatLng = mapLngLat(record);
-      record.set("/5", Field.create(firstResultLatLng.getLng()));
-      record.set("/6", Field.create(firstResultLatLng.getLat()));
+      record.set("/Longitude", Field.create(firstResultLatLng.getLng()));
+      record.set("/Latitude", Field.create(firstResultLatLng.getLat()));
     }
     HotelData hotel = HotelParser.parse(record);
     String hash = GeoHashGenerator.generateGeoHash(hotel);
-    record.set("/7", Field.create(hash));
+    record.set("/geoHash", Field.create(hash));
     batchMaker.addRecord(record);
     LOG.info("Generated hash is: {}", hash);
     LOG.info("Record is over");
