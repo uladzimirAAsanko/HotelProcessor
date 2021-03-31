@@ -70,7 +70,9 @@ public abstract class SampleProcessor extends SingleLaneRecordProcessor {
     LOG.info("Input record: {}", record);
     for (String fieldPath : record.getEscapedFieldPaths()) {
       Field field = record.get(fieldPath);
+
       LOG.info("Field in record is: {}", field);
+      LOG.info("Field path is: {}", fieldPath);
     }
     LOG.info("Record is over");
     // This example is a no-op
