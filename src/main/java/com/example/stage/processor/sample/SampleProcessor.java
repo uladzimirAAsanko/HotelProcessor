@@ -66,6 +66,9 @@ public abstract class SampleProcessor extends SingleLaneRecordProcessor {
   @Override
   protected void process(Record record, SingleLaneBatchMaker batchMaker) throws StageException {
     LOG.info("Input record: {}", record);
+    if(record.get("/5") == null || record.get("/6") == null){
+      return;
+    }
     if(HotelParser.getValue(record,5).equals(HotelParser.NULL_DATA) ||
             HotelParser.getValue(record,6).equals(HotelParser.NULL_DATA)){
       JOpenCageLatLng firstResultLatLng = mapLngLat(record);
