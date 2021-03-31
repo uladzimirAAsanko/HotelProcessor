@@ -31,8 +31,8 @@ public class HotelParser {
         String address = getValue(record, 4);
         String longitude = getValue(record, 5);
         String latitude = getValue(record, 6);
-        double real_ltd = Long.parseLong(latitude);
-        double real_lng = Long.parseLong(longitude);
+        double real_ltd = Double.parseDouble(latitude);
+        double real_lng = Double.parseDouble(longitude);
         return new HotelData(id, name, country, city, address, real_lng,real_ltd);
     }
 
