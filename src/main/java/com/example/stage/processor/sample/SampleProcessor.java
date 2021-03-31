@@ -19,8 +19,15 @@
  */
 package com.example.stage.processor.sample;
 
+import com.byteowls.jopencage.JOpenCageGeocoder;
+import com.byteowls.jopencage.model.JOpenCageForwardRequest;
+import com.byteowls.jopencage.model.JOpenCageLatLng;
+import com.byteowls.jopencage.model.JOpenCageResponse;
+import com.example.stage.entity.GeoHashGenerator;
+import com.example.stage.entity.HotelData;
 import com.example.stage.lib.sample.Errors;
 
+import com.example.stage.parser.HotelParser;
 import com.streamsets.pipeline.api.Field;
 import com.streamsets.pipeline.api.Record;
 import com.streamsets.pipeline.api.StageException;
@@ -33,15 +40,10 @@ import java.util.List;
 
 public abstract class SampleProcessor extends SingleLaneRecordProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(SampleProcessor.class);
-  /**
-   * Gives access to the UI configuration of the stage provided by the {@link SampleDProcessor} class.
-   */
   public abstract String getConfig();
 
-  /** {@inheritDoc} */
   @Override
   protected List<ConfigIssue> init() {
-    // Validate configuration values and open any required resources.
     List<ConfigIssue> issues = super.init();
 
     if (getConfig().equals("invalidValue")) {
@@ -51,32 +53,39 @@ public abstract class SampleProcessor extends SingleLaneRecordProcessor {
           )
       );
     }
-
-    // If issues is not empty, the UI will inform the user of each configuration issue in the list.
     return issues;
   }
 
   /** {@inheritDoc} */
   @Override
   public void destroy() {
-    // Clean up any open resources.
     super.destroy();
   }
 
   /** {@inheritDoc} */
   @Override
   protected void process(Record record, SingleLaneBatchMaker batchMaker) throws StageException {
-    // TODO: Implement your record processing here, then add to the output batch.
     LOG.info("Input record: {}", record);
-    for (String fieldPath : record.getEscapedFieldPaths()) {
-      Field field = record.get(fieldPath);
-
-      LOG.info("Field in record is: {}", field);
-      LOG.info("Field path is: {}", fieldPath);
+    if(HotelParser.getValue(record,5).equals(HotelParser.NULL_DATA) ||
+            HotelParser.getValue(record,6).equals(HotelParser.NULL_DATA)){
+      JOpenCageLatLng firstResultLatLng = mapLngLat(record);
+      record.set("/5", Field.create(firstResultLatLng.getLng()));
+      record.set("/6", Field.create(firstResultLatLng.getLat()));
     }
-    LOG.info("Record is over");
-    // This example is a no-op
+    HotelData hotel = HotelParser.parse(record);
+    String hash = GeoHashGenerator.generateGeoHash(hotel);
+    record.set("/7", Field.create(hash));
     batchMaker.addRecord(record);
+    LOG.info("Generated hash is: {}", hash);
+    LOG.info("Record is over");
   }
 
+
+  private JOpenCageLatLng mapLngLat(Record record){
+    JOpenCageGeocoder jOpenCageGeocoder = new JOpenCageGeocoder("b9e25eae43e5457b94284d92da69d15e");
+    JOpenCageForwardRequest request = new JOpenCageForwardRequest(HotelParser.getValue(record, 4));
+    request.setRestrictToCountryCode(HotelParser.getValue(record, 2));
+    JOpenCageResponse response = jOpenCageGeocoder.forward(request);
+    return response.getFirstPosition();
+  }
 }

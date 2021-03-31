@@ -27,7 +27,17 @@
     <junit.version>4.12</junit.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-
+  <repositories>
+    <!-- ... other repository elements ... -->
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>central</id>
+      <name>bintray</name>
+      <url>https://jcenter.bintray.com</url>
+    </repository>
+  </repositories>
   <dependencies>
     <!-- Core StreamSets Dependencies for Stage Libraries -->
     <!-- Need to be without snapshot at any the point of the release -->
@@ -50,6 +60,11 @@
       <scope>provided</scope>
     </dependency>
     <!-- end -->
+    <dependency>
+      <groupId>ch.hsr</groupId>
+      <artifactId>geohash</artifactId>
+      <version>1.4.0</version>
+    </dependency>
 
     <!-- Test Dependencies -->
     <dependency>
@@ -63,6 +78,11 @@
       <artifactId>streamsets-datacollector-sdk</artifactId>
       <version>${streamsets.version}</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.byteowls</groupId>
+      <artifactId>jopencage</artifactId>
+      <version>1.2.1</version>
     </dependency>
   </dependencies>
 
