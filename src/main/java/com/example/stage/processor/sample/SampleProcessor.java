@@ -66,43 +66,11 @@ public abstract class SampleProcessor extends SingleLaneRecordProcessor {
   @Override
   protected void process(Record record, SingleLaneBatchMaker batchMaker) throws StageException {
     LOG.info("Input record: {}", record);
-    try {
-      Double.parseDouble(HotelParser.getValue(record,5));
-      Double.parseDouble(HotelParser.getValue(record,6));
-    }catch (NumberFormatException e){
-      LOG.info("Invalid data for Lng and Lat");
-      JOpenCageLatLng firstResultLatLng = mapLngLat(record);
-      if(firstResultLatLng == null){
-        return;
-      }
-      record.set("/Longitude", Field.create(firstResultLatLng.getLng()));
-      record.set("/Latitude", Field.create(firstResultLatLng.getLat()));
-    }
-    HotelData hotel = HotelParser.parse(record);
-    String hash = "";
-    try {
-      hash = GeoHashGenerator.generateGeoHash(hotel);
-    }catch (IllegalArgumentException e){
-      LOG.info("Ilegal Lng or Lat: {}", e.getMessage());
-      JOpenCageLatLng firstResultLatLng = mapLngLat(record);
-      record.set("/Longitude", Field.create(firstResultLatLng.getLng()));
-      record.set("/Latitude", Field.create(firstResultLatLng.getLat()));
-      HotelData changed_hotel = HotelParser.parse(record);
-      hash = GeoHashGenerator.generateGeoHash(changed_hotel);
-    }
+    HotelData changed_hotel = HotelParser.parse(record);
+    String hash = GeoHashGenerator.generateGeoHash(changed_hotel);
     record.set("/geoHash", Field.create(hash));
     batchMaker.addRecord(record);
     LOG.info("Generated hash is: {}", hash);
-    LOG.info("Record is over");
+    LOG.info("Output record: {}", record);
   }
-
-
-  private JOpenCageLatLng mapLngLat(Record record){
-    JOpenCageGeocoder jOpenCageGeocoder = new JOpenCageGeocoder("b9e25eae43e5457b94284d92da69d15e");
-    JOpenCageForwardRequest request = new JOpenCageForwardRequest(HotelParser.getValue(record, 4));
-    request.setRestrictToCountryCode(HotelParser.getValue(record, 2));
-    JOpenCageResponse response = jOpenCageGeocoder.forward(request);
-    return response.getFirstPosition();
-  }
-
 }
